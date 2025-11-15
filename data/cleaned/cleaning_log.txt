@@ -1,0 +1,38 @@
+[2025-11-16 00:15:06] Loading raw data...
+[2025-11-16 00:15:09] Loaded 5155 movies
+[2025-11-16 00:15:10] Loaded 6513 reviews
+[2025-11-16 00:15:10] 
+Processing movies...
+[2025-11-16 00:15:10] Initial shape: (5155, 28)
+[2025-11-16 00:15:10] Extracted fields. Shape: (5155, 19)
+[2025-11-16 00:15:10] 
+Aggregating reviews...
+[2025-11-16 00:15:10] Aggregated reviews for 1875 movies
+[2025-11-16 00:15:10] 
+Merging movies and reviews...
+[2025-11-16 00:15:10] Merged data shape: (5155, 21)
+[2025-11-16 00:15:10] 
+Creating clean_text field...
+[2025-11-16 00:15:13] Created clean_text for 5155 records
+[2025-11-16 00:15:13] 
+Handling missing values...
+[2025-11-16 00:15:13] Removed 160 rows with null overview
+[2025-11-16 00:15:13] Removed 0 rows with null clean_text
+[2025-11-16 00:15:13] Remaining nulls: 25
+[2025-11-16 00:15:13] 
+Validating data...
+[2025-11-16 00:15:13] Removed 27 rows with invalid year
+[2025-11-16 00:15:13] Data validation complete
+[2025-11-16 00:15:13] 
+Removing duplicates...
+[2025-11-16 00:15:13] Removed 0 duplicate records
+[2025-11-16 00:15:13] 
+Finalizing dataset...
+[2025-11-16 00:15:13] Final dataset: (4968, 22)
+[2025-11-16 00:15:13] 
+Generating data quality report...
+[2025-11-16 00:15:13] 
+Saving results...
+[2025-11-16 00:15:14] ✅ Saved: data\cleaned\cleaned_movies.csv
+[2025-11-16 00:15:14]    Size: 6044.46 KB
+[2025-11-16 00:15:14] ✅ Saved: data\cleaned\data_quality_report.txt

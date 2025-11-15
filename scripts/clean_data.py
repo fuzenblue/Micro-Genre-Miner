@@ -23,6 +23,26 @@ REPORT_FILE = OUTPUT_DIR / "data_quality_report.txt"
 STOP_WORDS = set(stopwords.words('english'))
 
 
+def normalize_genres(genres):
+    """Normalize genres into a list of strings."""
+    if genres is None:
+        return []
+
+    # Convert numpy array to list
+    if hasattr(genres, "__array__"):
+        genres = genres.tolist()
+
+    # Only accept list/tuple
+    if not isinstance(genres, (list, tuple)):
+        return []
+
+    cleaned = []
+    for g in genres:
+        if isinstance(g, dict) and "name" in g:
+            cleaned.append(g["name"])
+    return cleaned
+
+
 class DataCleaner:
     """Class สำหรับทำความสะอาดข้อมูล"""
     
@@ -175,21 +195,16 @@ class DataCleaner:
         
         # ===== EXTRACT GENRES =====
         
-        def extract_genres(genres_list):
-            if pd.isna(genres_list) or not genres_list:
-                return ''
-            return ' '.join([g['name'] for g in genres_list])
-        
-        movies_clean['genres'] = df['genres'].apply(extract_genres)
+        movies_clean['genres'] = df['genres'].apply(normalize_genres)
         
         # ===== EXTRACT KEYWORDS =====
         
         def extract_keywords(keywords_obj):
             if pd.isna(keywords_obj) or not keywords_obj:
-                return ''
+                return []
             
             keywords_list = keywords_obj.get('keywords', [])
-            return ' '.join([k['name'] for k in keywords_list])
+            return [k['name'] for k in keywords_list]
         
         movies_clean['keywords'] = df['keywords'].apply(extract_keywords)
         
@@ -263,36 +278,27 @@ class DataCleaner:
         
         def combine_text(row):
             parts = []
-            
-            # Overview
-            if pd.notna(row['overview']) and row['overview']:
-                parts.append(str(row['overview']))
-            
-            # Tagline
-            if pd.notna(row['tagline']) and row['tagline']:
-                parts.append(str(row['tagline']))
-            
-            # Genres
-            if pd.notna(row['genres']) and row['genres']:
-                parts.append(str(row['genres']))
-            
-            # Keywords
-            if pd.notna(row['keywords']) and row['keywords']:
-                parts.append(str(row['keywords']))
-            
-            # Cast & Director
-            if pd.notna(row['cast']) and row['cast']:
-                parts.append(str(row['cast']))
-            
-            if pd.notna(row['director']) and row['director']:
-                parts.append(str(row['director']))
-            
-            # Reviews (ตัดให้สั้น เพราะยาวมาก)
-            if pd.notna(row['reviews_text']) and row['reviews_text']:
-                reviews = str(row['reviews_text'])[:1000]  # เอาแค่ 1000 ตัวอักษรแรก
-                parts.append(reviews)
-            
-            return ' '.join(parts)
+
+            # overview
+            if pd.notna(row.get("overview")):
+                parts.append(str(row["overview"]))
+
+            # genres
+            genres = row.get("genres", [])
+            if isinstance(genres, (list, tuple)) and len(genres) > 0:
+                parts.append(" ".join(genres))
+
+            # keywords
+            keywords = row.get("keywords", [])
+            if isinstance(keywords, (list, tuple)) and len(keywords) > 0:
+                parts.append(" ".join(keywords))
+
+            # reviews
+            review_texts = row.get("review_texts", [])
+            if isinstance(review_texts, (list, tuple)) and len(review_texts) > 0:
+                parts.append(" ".join(review_texts))
+
+            return " ".join(parts)
         
         # Combine all text
         df['raw_text'] = df.apply(combine_text, axis=1)
