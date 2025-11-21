@@ -1,10 +1,4 @@
-# Movie Recommendation System
-
-## Project Overview
-
-ระบบแนะนำภาพยนตร์โดยใช้ Machine Learning วิเคราะห์จากเนื้อหา (Content-Based Filtering) และความคิดเห็นผู้ใช้ (Collaborative Filtering)
-
----
+# Micro Genre Miner
 
 ## 📊 Data Source
 
