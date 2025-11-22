@@ -7,7 +7,7 @@ def verify_cleaned_data():
     print("="*80)
     
     # Load cleaned data
-    file_path = Path("data/cleaned/cleaned_movies.csv")
+    file_path = Path("../../data/cleaned/cleaned_movies.csv")
     
     if not file_path.exists():
         print("❌ Error: cleaned_movies.csv not found!")
@@ -101,11 +101,6 @@ def verify_cleaned_data():
         print(f"   Rating: {row['vote_average']}/10")
         print(f"   Clean text: {len(row['clean_text'])} chars")
         print(f"   Review count: {row['review_count']}")
-    
-    print("\n" + "="*80)
-    print("✅ VERIFICATION PASSED")
-    print("="*80)
-    print("\nDataset is ready for Phase 3 (Model Building)")
     
     return True
 

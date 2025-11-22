@@ -7,7 +7,7 @@ def verify_data():
     print("="*80)
     
     # Load movies
-    movies_file = Path("data/raw/raw_movies.json")
+    movies_file = Path("../../data/raw/raw_movies.json")
     with open(movies_file, 'r', encoding='utf-8') as f:
         movies = json.load(f)
     
@@ -28,7 +28,7 @@ def verify_data():
     print(f"   Genres: {sorted(all_genres)}")
     
     # Load reviews
-    reviews_file = Path("data/raw/raw_reviews.json")
+    reviews_file = Path("../../data/raw/raw_reviews.json")
     with open(reviews_file, 'r', encoding='utf-8') as f:
         reviews = json.load(f)
     

@@ -135,7 +135,7 @@ class DataCleaner:
         # Step 2: Remove special characters
         text = self.remove_special_chars(text)
         
-        # Step 3: Remove stopwords (optional)
+        # Step 3: Remove stopwords
         if remove_stops:
             text = self.remove_stopwords(text)
         
@@ -154,7 +154,7 @@ class DataCleaner:
             year = int(str(date_str).split('-')[0])
             
             # Validate year range
-            if 1800 <= year <= 2030:
+            if 1900 <= year <= 2030:
                 return year
             else:
                 return None

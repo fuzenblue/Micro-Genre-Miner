@@ -158,11 +158,15 @@ clean_overview:
 ================================================================================
 POTENTIAL DATA QUALITY ISSUES
 ================================================================================
+Removed null overview: 160
+Removed invalid year: 27
+Filled missing values: 6
 
 Movies with no reviews: 3093 (62.26%)
 Movies with no budget info: 3277 (65.96%)
 Movies with no revenue info: 3294 (66.30%)
 Movies with <10 votes: 1658 (33.37%)
+
 
 ================================================================================
 RECOMMENDATIONS
