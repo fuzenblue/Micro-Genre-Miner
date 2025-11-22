@@ -23,7 +23,11 @@ sentence-transformers
 umap-learn
 textblob
 streamlit
+<<<<<<< HEAD
 pandas
 pyarrow
 matplotlib
+=======
+pyarrow
+>>>>>>> b1a2a0f368a30aed2538d6a5f2b33d3e06c9bf87
 wordcloud
