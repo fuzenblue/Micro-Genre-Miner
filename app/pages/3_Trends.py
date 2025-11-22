@@ -6,7 +6,7 @@ st.title("📈 Trends")
 
 @st.cache_data
 def load_data():
-    return pd.read_parquet("micro_genre.parquet")
+    return pd.read_parquet("movie_clusters_keybert.parquet")
 
 df = load_data()
 

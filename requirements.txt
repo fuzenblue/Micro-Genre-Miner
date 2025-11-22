@@ -22,3 +22,8 @@ urllib3==2.5.0
 sentence-transformers
 umap-learn
 textblob
+streamlit
+pandas
+pyarrow
+matplotlib
+wordcloud
