@@ -1,83 +1,60 @@
-# llm_workflow.py
 import os
 import pandas as pd
-import openai
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
+from keybert import KeyBERT
 
 # ----------------------------
 # CONFIG
 # ----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INPUT_CLUSTER_PATH = os.path.join(BASE_DIR, "../../data/processed/movie_clusters.csv")
-OUTPUT_LLM_PATH = os.path.join(BASE_DIR, "../../data/processed/movie_clusters_llm.csv")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OUTPUT_KEYBERT_PATH = os.path.join(BASE_DIR, "../../data/processed/movie_clusters_keybert.csv")
 
-if not OPENAI_API_KEY:
-    raise ValueError("Please set OPENAI_API_KEY environment variable.")
-
-openai.api_key = OPENAI_API_KEY
+TOP_KEYWORDS_PER_CLUSTER = 10  # จะเอา top 10 TF-IDF keywords ต่อ cluster
+TOP_KEYWORDS_FOR_LABEL = 3     # จะเอา 1-3 keywords เป็น micro-genre label
 
 # ----------------------------
-# 1) Load cluster data
+# 1) Load clustered movie data
 # ----------------------------
 df = pd.read_csv(INPUT_CLUSTER_PATH)
 print(f"[INFO] Loaded clustered movies: {len(df)} rows")
 
 # ----------------------------
-# 2) Helper: LLM micro-genre suggestion
+# 2) Initialize KeyBERT model
 # ----------------------------
-def suggest_micro_genre(movie_title, description, current_micro_genre):
-    """
-    ส่ง prompt ไป LLM เพื่อให้ generate concise micro-genre
-    """
-    prompt = f"""
-Movie Title: "{movie_title}"
-Description: "{description}"
-Current micro-genre: "{current_micro_genre}"
-
-Suggest a concise, meaningful micro-genre (1-3 words) for this movie:
-"""
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            mmessages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Summarize Frankenstein in one sentence."}
-            ],
-            temperature=0.5,
-            max_tokens=20
-        )
-        suggested = response.choices[0].message.content.strip()
-        return suggested
-    except Exception as e:
-        print(f"[ERROR] LLM failed for '{movie_title}': {e}")
-        return current_micro_genre  # fallback
+kw_model = KeyBERT('all-MiniLM-L6-v2')  # lightweight BERT model
 
 # ----------------------------
-# 3) Apply LLM to dataset (example: first 50 movies)
+# 3) Generate micro-genre labels per cluster
 # ----------------------------
-df["micro_genre_llm"] = df.apply(
-    lambda row: suggest_micro_genre(row["title"], row["clean_text"], row["micro_genre_name"]),
-    axis=1
-)
+cluster_labels = {}
+
+for c in sorted(df['cluster'].unique()):
+    cluster_df = df[df['cluster'] == c]
+    texts = cluster_df['clean_text'].fillna("").tolist()
+    
+    # combine all text in cluster
+    combined_text = " ".join(texts)
+    
+    # extract top keywords using KeyBERT
+    keywords = kw_model.extract_keywords(combined_text, keyphrase_ngram_range=(1,2),
+                                         stop_words='english', top_n=TOP_KEYWORDS_FOR_LABEL)
+    
+    label = " / ".join([kw[0] for kw in keywords]) if keywords else "Unknown-Genre"
+    cluster_labels[c] = label
+    print(f"[INFO] Cluster {c}: {label}")
 
 # ----------------------------
-# 4) Save results
+# 4) Apply labels to dataframe
 # ----------------------------
-df.to_csv(OUTPUT_LLM_PATH, index=False)
-print(f"[INFO] Saved LLM-enhanced clusters to {OUTPUT_LLM_PATH}")
+df['micro_genre_keybert'] = df['cluster'].map(cluster_labels)
 
 # ----------------------------
-# 5) Optional: Semantic similarity recommendation
+# 5) Optionally, get representative movies (top 5 by popularity)
 # ----------------------------
-# Example: find top 5 similar movies based on cluster embedding
-# Assuming df has "embedding" column (numpy array saved as string)
-def recommend_similar_movies(target_index, top_k=5):
-    embeddings = np.vstack(df["embedding"].apply(lambda x: np.fromstring(x[1:-1], sep=' ')))
-    sim = cosine_similarity([embeddings[target_index]], embeddings)[0]
-    top_idx = sim.argsort()[::-1][1:top_k+1]  # skip self
-    return df.iloc[top_idx][["title", "micro_genre_llm"]].to_dict(orient="records")
+df['sample_movies'] = df.groupby('cluster')['title'].transform(lambda x: ", ".join(x.head(5)))
 
-# Example usage
-print(recommend_similar_movies(target_index=0, top_k=5))
+# ----------------------------
+# 6) Save results
+# ----------------------------
+df.to_csv(OUTPUT_KEYBERT_PATH, index=False)
+print(f"[INFO] Saved KeyBERT-enhanced clusters to {OUTPUT_KEYBERT_PATH}")

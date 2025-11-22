@@ -5,8 +5,8 @@ import os
 # CONFIG
 # ----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INPUT_PATH = os.path.join(BASE_DIR, "../../data/processed/movie_clusters_llm.csv")  # ไฟล์ output ปัจจุบัน
-OUTPUT_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "movie_clusters_llm.csv")  # เซฟลง Downloads
+INPUT_PATH = os.path.join(BASE_DIR, "../../data/processed/movie_clusters_keybert.csv")  # ไฟล์ output ปัจจุบัน
+OUTPUT_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "movie_clusters_keybert.csv")  # เซฟลง Downloads
 
 # ----------------------------
 # LOAD CSV
