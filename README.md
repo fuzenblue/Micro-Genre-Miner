@@ -44,7 +44,7 @@
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/movie-recommendation-system.git
+git clone https://github.com/yourusername/Micro-Genre-Miner.git
 cd movie-recommendation-system
 
 # Create virtual environment
@@ -65,7 +65,7 @@ cp .env.example .env
 
 ## 📁 Project Structure
 ```
-movie-recommendation-system/
+Micro-Genre-Miner/
 ├── data/
 │   ├── raw/                  # Raw data from TMDB
 │   │   ├── raw_movies.json
