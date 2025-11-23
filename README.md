@@ -1,5 +1,14 @@
 # Micro Genre Miner
 
+A movie recommendation system that analyzes micro-genres using machine learning and data from The Movie Database (TMDB). This project helps discover hidden patterns in movie preferences and provides personalized recommendations.
+
+## 🎬 What This Project Does
+
+- **Data Mining**: Extracts movie data from TMDB API
+- **Genre Analysis**: Identifies micro-genres and patterns
+- **Recommendation Engine**: Suggests movies based on user preferences
+- **Data Visualization**: Creates insights from movie datasets
+
 ## 📊 Data Source
 
 ### The Movie Database (TMDB)
@@ -34,31 +43,55 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Python 3.8+
-- pip
-- TMDB API Key
+- Python 3.8+ installed
+- Git installed
+- Internet connection for API calls
 
-### Installation
+### Step 1: Clone & Setup
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/yourusername/Micro-Genre-Miner.git
-cd movie-recommendation-system
+cd Micro-Genre-Miner
 
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Mac/Linux
-# or
-venv\Scripts\activate  # Windows
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# Mac/Linux:
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Setup environment
-cp .env.example .env
-# Edit .env and add your TMDB_API_KEY
+### Step 2: Get TMDB API Key
+1. Go to [TMDB](https://www.themoviedb.org/signup) and create account
+2. Navigate to Settings → API → Request API Key
+3. Choose "Developer" and fill out the form
+4. Copy your API key
+
+### Step 3: Configure Environment
+```bash
+# Create .env file
+echo TMDB_API_KEY=your_actual_api_key_here > .env
+echo TMDB_BASE_URL=https://api.themoviedb.org/3 >> .env
+```
+
+### Step 4: Run the Project
+```bash
+# Fetch movie data
+python scripts/fetch_data.py
+
+# Clean and process data
+python scripts/clean_data.py
+
+# Build recommendation model
+python scripts/build_model.py
 ```
 
 ---
@@ -66,35 +99,70 @@ cp .env.example .env
 ## 📁 Project Structure
 ```
 Micro-Genre-Miner/
-├── data/
-│   ├── raw/                  # Raw data from TMDB
-│   │   ├── raw_movies.json
-│   │   └── raw_reviews.json
-│   └── processed/            # Cleaned data
-├── scripts/
-│   ├── fetch_data.py         # Data fetching script
-│   ├── clean_data.py         # Data cleaning (Phase 2)
-│   └── build_model.py        # Model building (Phase 3)
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks (analysis)
-├── docs/
-│   ├── data_dictionary.md    # Data field descriptions
-│   └── methodology.md        # Technical approach
-├── .env                      # API keys (not committed)
-├── .gitignore
-├── requirements.txt
-└── README.md
+├── 📂 data/
+│   ├── 📂 raw/                  # Raw data from TMDB API
+│   │   ├── raw_movies.json      # Movie metadata
+│   │   └── raw_reviews.json     # User reviews
+│   └── 📂 processed/            # Cleaned & processed data
+├── 📂 scripts/
+│   ├── 🐍 fetch_data.py         # Download data from TMDB
+│   ├── 🧹 clean_data.py         # Data preprocessing
+│   └── 🤖 build_model.py        # Train ML models
+├── 📂 models/                   # Saved ML models
+├── 📂 notebooks/                # Jupyter analysis notebooks
+├── 📂 docs/                     # Documentation
+│   ├── data_dictionary.md       # Data field descriptions
+│   └── methodology.md           # Technical methodology
+├── 🔐 .env                      # API keys (create this!)
+├── 📋 requirements.txt          # Python dependencies
+└── 📖 README.md                 # This file
 ```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**API Key Error:**
+```
+Error: Invalid API key
+```
+- Check your `.env` file exists
+- Verify API key is correct (no extra spaces)
+- Ensure you're using the v3 API key from TMDB
+
+**Module Not Found:**
+```
+ModuleNotFoundError: No module named 'requests'
+```
+- Make sure virtual environment is activated
+- Run `pip install -r requirements.txt`
+
+**Permission Denied:**
+- On Windows: Run terminal as Administrator
+- On Mac/Linux: Check file permissions with `ls -la`
+
+### Getting Help
+- Check existing [Issues](https://github.com/yourusername/Micro-Genre-Miner/issues)
+- Create new issue with error details
+- Include your Python version and OS
 
 ---
 
-## 📖 Data Dictionary
+## 📊 Dataset Overview
 
-See [docs/data_dictionary.md](docs/data_dictionary.md) for detailed field descriptions.
+**Current Dataset Size:**
+- 🎬 **Movies**: 5,155 films (~177 MB)
+- 📝 **Reviews**: 18,076 reviews (~11 MB)
+- 🏷️ **Fields**: 25+ attributes per movie
 
-**Quick Summary:**
-- **Movies Dataset**: 5155 movies, ~177,390 KB, 25+ fields per movie
-- **Reviews Dataset**: ~18076 reviews, ~11,733 KB, user ratings and text
+**Key Data Fields:**
+- Movie metadata (title, overview, release date)
+- Genre classifications and keywords
+- Ratings, popularity scores, revenue
+- Cast and crew information
+- User reviews and ratings
+
+For complete field descriptions, see [docs/data_dictionary.md](docs/data_dictionary.md)
 
 ---
 
@@ -150,9 +218,12 @@ See [docs/data_dictionary.md](docs/data_dictionary.md) for detailed field descri
 
 - **TMDB**: For providing comprehensive movie database API
 - **Open Source Community**: For libraries and tools used
+- **Contributors**: Everyone who helps improve this project
 
 ---
 
-**Last Updated:** 2025-11-15  
-**Dataset Version:** 1.0  
+**Last Updated:** 2025-09-23  
+**Version:** 1.0  
 **API Version:** TMDB API v3
+
+⭐ **Star this repo if you find it helpful!**
