@@ -6,8 +6,6 @@
 |------|-------------|---------|------|--------|
 | `raw_movies.json` | Movie metadata from TMDB | 5,155 | ~177 MB | ✅ Available |
 | `raw_reviews.json` | User reviews from TMDB | 18,076 | ~11 MB | ✅ Available |
-| `processed_movies.csv` | Cleaned movie data | 5,155 | ~25 MB | 🔄 Generated |
-| `processed_reviews.csv` | Cleaned review data | 18,076 | ~8 MB | 🔄 Generated |
 
 ---
 
@@ -154,7 +152,7 @@ Array of review objects from TMDB users
 ### Movies Dataset Quality
 - **Total Records**: 5,155 movies
 - **Completeness**: 95% of core fields populated
-- **Date Range**: 1916-2024 (108 years)
+- **Date Range**: 1900-2030 (130 years)
 - **Languages**: 85 different languages
 - **Genres**: 20 unique genres
 
@@ -261,18 +259,7 @@ Array of review objects from TMDB users
 **Collection Period:** November 2024 - January 2025  
 **API Version:** TMDB API v3  
 **Data Freshness:** Updated weekly from TMDB  
-**Last Update:** 2025-01-15
-
----
-
-## 📝 Update History
-
-| Date | Version | Changes | Records |
-|------|---------|---------|----------|
-| 2024-11-15 | 0.1 | Initial data collection | 1,000 movies |
-| 2024-12-01 | 0.5 | Expanded to popular movies | 3,000 movies |
-| 2024-12-15 | 0.8 | Added reviews dataset | 12,000 reviews |
-| 2025-01-15 | 1.0 | Final dataset release | 5,155 movies, 18,076 reviews |
+**Last Update:** 2025-11-23
 
 ---
 
@@ -321,6 +308,6 @@ review_lengths = reviews_df['content'].str.len().describe()
 
 ---
 
-**Last Updated:** 2025-01-15  
+**Last Updated:** 2025-11-23  
 **Dataset Version:** 1.0  
 **API Version:** TMDB API v3
