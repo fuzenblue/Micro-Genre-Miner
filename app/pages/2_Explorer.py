@@ -5,194 +5,232 @@ from pathlib import Path
 
 st.title("Explorer — ค้นหาหนัง")
 
+# -----------------------------
+# SESSION STATE INIT
+# -----------------------------
+def init_state(key, value):
+    if key not in st.session_state:
+        st.session_state[key] = value
+
+init_state("open_dialog", False)
+init_state("dialog_row", None)
+init_state("dialog_poster", None)
+init_state("selected_micro", "All")
+init_state("filter_genre", None)
+init_state("dialog_key", None)
+init_state("last_filters", {"micro": "All", "keyword": "", "genre": None})
+
+# -----------------------------
+# RESET DIALOG
+# -----------------------------
+def reset_dialog():
+    st.session_state.open_dialog = False
+    st.session_state.dialog_row = None
+    st.session_state.dialog_poster = None
+    st.session_state.dialog_key = None
+
+
+# -----------------------------
+# LOAD DATA
+# -----------------------------
 @st.cache_data
 def load_data():
-    # Load movie clusters
     clusters_df = pd.read_parquet("movie_clusters_keybert.parquet")
     
-    # Load raw movies for poster_path and genres
     movies_file = Path("../data/raw/raw_movies.json")
     with open(movies_file, 'r', encoding='utf-8') as f:
         movies_data = json.load(f)
-    
+
     movies_df = pd.DataFrame(movies_data)[['title', 'poster_path', 'genres']]
     
-    # Load cleaned movies for additional details
     cleaned_file = Path("../data/processed/cleaned_movies.csv")
     if cleaned_file.exists():
         cleaned_df = pd.read_csv(cleaned_file)
-        # Merge all data
         merged_df = clusters_df.merge(movies_df, on='title', how='left')
         merged_df = merged_df.merge(cleaned_df, on='title', how='left', suffixes=('', '_cleaned'))
     else:
         merged_df = clusters_df.merge(movies_df, on='title', how='left')
-    
+
     return merged_df
 
-def split_micro_genres(micro_genre_text):
-    """Split micro genres by / and return as list"""
-    if pd.isna(micro_genre_text) or not micro_genre_text:
+
+def split_micro_genres(txt):
+    if pd.isna(txt) or not txt:
         return []
-    return [genre.strip() for genre in str(micro_genre_text).split('/')]
+    return [g.strip() for g in str(txt).split('/')]
+
 
 df = load_data()
 
-# Get all unique micro genres
-all_micro_genres = []
-for micro_genre in df['micro_genre_keybert'].dropna():
-    all_micro_genres.extend(split_micro_genres(micro_genre))
-unique_micro_genres = ["All"] + sorted(set(all_micro_genres))
 
-# Filter
+# -----------------------------
+# MICRO GENRE FILTER OPTIONS
+# -----------------------------
+all_micro = []
+for mg in df['micro_genre_keybert'].dropna():
+    all_micro.extend(split_micro_genres(mg))
+
+unique_micro_genres = ["All"] + sorted(set(all_micro))
+
+
+# -----------------------------
+# FILTER UI
+# -----------------------------
 col1, col2 = st.columns(2)
+
+def reset_micro_filter():
+    st.session_state.selected_micro = "All"
+    reset_dialog()
+
+def reset_genre_filter():
+    st.session_state.filter_genre = None
+    reset_dialog()
+
 with col1:
-    selected = st.selectbox("Micro-Genre", unique_micro_genres)
+    selected = st.selectbox(
+        "Micro-Genre",
+        unique_micro_genres,
+        key="selected_micro"
+    )
+    
+    if selected != "All":
+        st.button("❌ ล้าง Filter Micro-Genre", on_click=reset_micro_filter)
+
 with col2:
     keyword = st.text_input("ค้นหาชื่อหนัง")
 
+
+# -----------------------------
+# FILTER LOGIC
+# -----------------------------
 result = df.copy()
 
-# Apply session state filters
-if 'filter_genre' in st.session_state:
-    result = result[result['genres'].fillna('').str.contains(st.session_state['filter_genre'], case=False, na=False)]
-    st.info(f"Filtered by genre: {st.session_state['filter_genre']}")
-    if st.button("Clear genre filter"):
-        del st.session_state['filter_genre']
-        st.rerun()
-
-if 'filter_micro_genre' in st.session_state:
-    result = result[result['micro_genre_keybert'].fillna('').str.contains(st.session_state['filter_micro_genre'], case=False, na=False)]
-    st.info(f"Filtered by micro genre: {st.session_state['filter_micro_genre']}")
-    if st.button("Clear micro genre filter"):
-        del st.session_state['filter_micro_genre']
-        st.rerun()
-
+# Micro-genre filter
 if selected != "All":
-    result = result[result['micro_genre_keybert'].fillna('').str.contains(selected, case=False, na=False)]
+    result = result[result['micro_genre_keybert'].fillna('').str.contains(
+        selected, case=False, na=False)]
 
+# Keyword search
 if keyword:
     result = result[result['title'].fillna('').str.contains(keyword, case=False, na=False)]
 
-# Limit to first 10 results if no search
-if not keyword and selected == "All" and 'filter_genre' not in st.session_state and 'filter_micro_genre' not in st.session_state:
-    result = result.head(10)
+# Genre filter
+if st.session_state.filter_genre:
+    result = result[result['genres'].fillna('').str.contains(
+        st.session_state.filter_genre, case=False, na=False)]
+    st.info(f"Filtered by genre: {st.session_state.filter_genre}")
+    st.button("❌ ล้าง Filter Genre", on_click=reset_genre_filter)
+
+# Default show first 12 movies
+if selected == "All" and not keyword and not st.session_state.filter_genre:
+    result = result.head(100)
 
 st.subheader(f"ผลลัพธ์ ({len(result)} เรื่อง)")
 
-# Display results as poster grid
+
+# -----------------------------
+# DISPLAY POSTER GRID
+# -----------------------------
 cols = st.columns(4)
 for idx, (_, row) in enumerate(result.iterrows()):
     col = cols[idx % 4]
-    
     with col:
-        if pd.notna(row.get('poster_path')):
+        poster_url = None
+        if pd.notna(row.get("poster_path")):
             poster_url = f"https://image.tmdb.org/t/p/w300{row['poster_path']}"
-            
-            # Display poster
-            st.image(poster_url, use_container_width=True)
-            
-            # Clickable title
-            if st.button(
-                row['title'][:30] + "..." if len(row['title']) > 30 else row['title'],
-                key=f"title_{idx}",
-                use_container_width=True
-            ):
-                @st.dialog(f"🎬 {row['title']}", width="large")
-                def show_movie_details():
-                    col1, col2, col3, col4 = st.columns([2, 1.5, 1, 1.5])
-                    
-                    with col1:
-                        st.image(poster_url, width=300)
-                        
-                        # Overview
-                        if pd.notna(row.get('overview')):
-                            st.write("**เรื่องย่อ:**")
-                            st.write(row['overview'])
-                    
-                    with col2:
-                        # Movie details
-                        st.write(f"**คะแนน:** {row.get('vote_average', 'N/A')}/10")
-                        st.write(f"**ความนิยม:** {row.get('popularity', 'N/A')}")
-                        st.write(f"**วันที่ออกฉาย:** {row.get('release_date', 'N/A')}")
-                        st.write(f"**ภาษา:** {row.get('original_language', 'N/A')}")
-                        st.write(f"**รายได้:** {row.get('revenue', 'N/A')}")
-                        st.write(f"**งบประมาณ:** {row.get('budget', 'N/A')}")
-                        st.write(f"**สถานะ:** {row.get('status', 'N/A')}")
-                        
-                        # Original genres
-                        if pd.notna(row.get('genres')):
-                            st.write("**Original Genres:**")
-                            for genre in str(row['genres']).split('/'):
-                                if st.button(genre.strip(), key=f"dialog_orig_{idx}_{genre.strip()}"):
-                                    st.session_state['filter_genre'] = genre.strip()
-                                    st.rerun()
-                        
-                        # Show genre from parquet file if available
-                        if pd.notna(row.get('genre')):
-                            st.write("**Genres:**")
-                            st.write(row['genre'])
-                    
-                    with col3:
-                        st.write(f"**Movie ID:** {row.get('movie_id', 'N/A')}")
-                        st.write(f"**Cluster:** {row.get('cluster', 'N/A')}")
-                        st.write(f"**Micro Genre Name:** {row.get('micro_genre_name', 'N/A')}")
-                    
-                    with col4:
-                        # Micro genres
-                        micro_genres = split_micro_genres(row.get('micro_genre_keybert', ''))
-                        if micro_genres:
-                            st.write("**Micro Genres:**")
-                            for genre in micro_genres:
-                                if st.button(genre, key=f"dialog_micro_{idx}_{genre}"):
-                                    st.session_state['filter_micro_genre'] = genre
-                                    st.rerun()
-                
-                show_movie_details()
+
+        if poster_url:
+            st.image(poster_url, width=250)
         else:
-            if st.button(f"🎬 {row['title']}", key=f"no_poster_{idx}"):
-                @st.dialog(f"🎬 {row['title']}", width="large")
-                def show_movie_details_no_poster():
-                    col1, col2, col3, col4 = st.columns([2, 1.5, 1, 1.5])
-                    
-                    with col1:
-                        # Overview
-                        if pd.notna(row.get('overview')):
-                            st.write("**เรื่องย่อ:**")
-                            st.write(row['overview'])
-                    
-                    with col2:
-                        # Movie details
-                        st.write(f"**คะแนน:** {row.get('vote_average', 'N/A')}/10")
-                        st.write(f"**ความนิยม:** {row.get('popularity', 'N/A')}")
-                        st.write(f"**วันที่ออกฉาย:** {row.get('release_date', 'N/A')}")
-                        st.write(f"**ภาษา:** {row.get('original_language', 'N/A')}")
-                        
-                        # Original genres
-                        if pd.notna(row.get('genres')):
-                            st.write("**Original Genres:**")
-                            for genre in str(row['genres']).split('/'):
-                                if st.button(genre.strip(), key=f"dialog_np_orig_{idx}_{genre}"):
-                                    st.session_state['filter_genre'] = genre.strip()
-                                    st.rerun()
-                        
-                        # Show genre from parquet file if available
-                        if pd.notna(row.get('genre')):
-                            st.write("**Genres:**")
-                            st.write(row['genre'])
-                    
-                    with col3:
-                        st.write(f"**Movie ID:** {row.get('movie_id', 'N/A')}")
-                        st.write(f"**Cluster:** {row.get('cluster', 'N/A')}")
-                        st.write(f"**Micro Genre Name:** {row.get('micro_genre_name', 'N/A')}")
-                    
-                    with col4:
-                        # Micro genres
-                        micro_genres = split_micro_genres(row.get('micro_genre_keybert', ''))
-                        if micro_genres:
-                            st.write("**Micro Genres:**")
-                            for genre in micro_genres:
-                                if st.button(genre, key=f"dialog_np_micro_{idx}_{genre}"):
-                                    st.session_state['filter_micro_genre'] = genre
-                                    st.rerun()
-                
-                show_movie_details_no_poster()
+            st.write("📦 ไม่มีโปสเตอร์")
+
+        btn_key = f"open_dialog_{idx}"
+        title_lower = row['title']
+        label = title_lower[:30] + "..." if len(title_lower) > 30 else title_lower
+
+        if st.button(label, key=btn_key):
+            st.session_state.open_dialog = True
+            st.session_state.dialog_row = row.to_dict()
+            st.session_state.dialog_poster = poster_url
+            st.session_state.dialog_key = btn_key
+            st.rerun()
+
+
+# -----------------------------
+# MOVIE DIALOG
+# -----------------------------
+def show_movie_dialog(row, poster_url):
+
+    @st.dialog(f"🎬 {row['title']}", width="large")
+    def _dialog():
+
+        col1, col2, col3, col4 = st.columns([2, 1.5, 1, 1.5])
+
+        # COLUMN 1 — Poster & Overview
+        with col1:
+            if poster_url:
+                st.image(poster_url, width=300)
+            if pd.notna(row.get("overview")):
+                st.write("### เรื่องย่อ")
+                st.write(row["overview"])
+
+        # COLUMN 2 — Original Genres
+        with col2:
+            st.write("### รายละเอียด")
+            st.write(f"คะแนน: {row.get('vote_average', 'N/A')}/10")
+            st.write(f"ความนิยม: {row.get('popularity', 'N/A')}")
+            st.write(f"วันที่ออกฉาย: {row.get('release_date', 'N/A')}")
+            st.write(f"ภาษา: {row.get('original_language', 'N/A')}")
+
+            if pd.notna(row.get("genres")):
+                st.write("### Original Genres")
+                for idx_g, g in enumerate(str(row["genres"]).split('/')):
+                    if st.button(g.strip(), key=f"genre_btn_{row['movie_id']}_{idx_g}"):
+                        st.session_state.filter_genre = g.strip()
+                        reset_dialog()
+                        st.rerun()
+
+        # COLUMN 3 — Cluster Info
+        with col3:
+            st.write("### ข้อมูลระบบ")
+            st.write(f"Movie ID: {row.get('movie_id', 'N/A')}")
+            st.write(f"Cluster: {row.get('cluster', 'N/A')}")
+            st.write(f"Micro Genre Name: {row.get('micro_genre_name', 'N/A')}")
+
+        # COLUMN 4 — Micro Genres
+        with col4:
+            mg_list = split_micro_genres(row.get("micro_genre_keybert"))
+            st.write("### Micro Genres")
+            for idx_mg, mg in enumerate(mg_list):
+                if st.button(mg, key=f"micro_btn_{row['movie_id']}_{idx_mg}"):
+                    st.session_state.selected_micro = mg
+                    reset_dialog()
+                    st.rerun()
+
+        st.write("---")
+        if st.button("❌ ปิดหน้าต่าง"):
+            reset_dialog()
+            st.rerun()
+
+    _dialog()
+
+# -----------------------------
+# AUTO CLOSE DIALOG WHEN FILTER CHANGES
+# -----------------------------
+current_filters = {
+    "micro": st.session_state.selected_micro,
+    "keyword": keyword,
+    "genre": st.session_state.filter_genre,
+}
+
+# ถ้า filter เปลี่ยนจากรอบก่อนหน้า → ต้องปิด dialog
+if current_filters != st.session_state.last_filters:
+    reset_dialog()
+    st.session_state.last_filters = current_filters
+
+# แสดง dialog
+if st.session_state.open_dialog and st.session_state.dialog_row:
+    show_movie_dialog(
+        st.session_state.dialog_row,
+        st.session_state.dialog_poster
+    )
