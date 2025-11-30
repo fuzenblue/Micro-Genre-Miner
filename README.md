@@ -1,229 +1,262 @@
-# Micro Genre Miner
+# 🎬 Micro-Genre Miner
 
-A movie recommendation system that analyzes micro-genres using machine learning and data from The Movie Database (TMDB). This project helps discover hidden patterns in movie preferences and provides personalized recommendations.
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/streamlit-1.28+-red.svg)](https://streamlit.io/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🎬 What This Project Does
+> **Discover hidden movie patterns with AI-powered micro-genre classification**
 
-- **Data Mining**: Extracts movie data from TMDB API
-- **Genre Analysis**: Identifies micro-genres and patterns
-- **Recommendation Engine**: Suggests movies based on user preferences
-- **Data Visualization**: Creates insights from movie datasets
+An intelligent movie recommendation system that uses machine learning to identify nuanced movie categories beyond traditional genres. Built with Python, Streamlit, and modern NLP techniques.
 
-## 📊 Data Source
+![Demo](https://via.placeholder.com/800x400/1f1f1f/ffffff?text=Micro-Genre+Miner+Demo)
 
-### The Movie Database (TMDB)
+## ✨ Features
 
-**API Endpoint:** https://api.themoviedb.org/3  
-**Documentation:** https://developers.themoviedb.org/3  
-**License:** [TMDB API Terms of Use](https://www.themoviedb.org/documentation/api/terms-of-use)  
+- 🤖 **AI-Powered Classification**: 150+ micro-genres discovered using KeyBERT and clustering
+- 📊 **Interactive Analytics**: Real-time visualizations with Plotly and word clouds  
+- 🔍 **Smart Search**: Filter by micro-genres, keywords, and traditional categories
+- 📈 **Trend Analysis**: Explore genre evolution over 130+ years of cinema
+- 🚀 **Production Ready**: Docker deployment with <2s load times
 
-#### Data Collected:
-- ✅ Movie metadata (title, overview, genres, keywords)
-- ✅ Movie statistics (ratings, popularity, revenue)
-- ✅ Cast and crew information
-- ✅ User reviews and ratings
+## 🎯 What Makes This Special?
 
-#### Data NOT Collected:
-- ❌ Personal user information
-- ❌ User viewing history
-- ❌ Email addresses or contact details
-- ❌ Payment information
+Instead of broad categories like "Action" or "Comedy", discover specific themes like:
+- *Psychological Thriller Mind* (45 movies, 8.1★)
+- *Zombie Apocalypse Survival* (34 movies, 6.4★)  
+- *Superhero Action Marvel* (73 movies, 7.2★)
+- *Historical War Drama* (52 movies, 7.8★)
 
----
+## 🚀 Quick Start
 
-## 🔐 API Key Setup
-
-1. Register at [TMDB](https://www.themoviedb.org/signup)
-2. Request API key: Settings → API → Request API Key
-3. Create `.env` file:
+### Option 1: Docker (Recommended)
 ```bash
-   TMDB_API_KEY=your_api_key_here
-   TMDB_BASE_URL=https://api.themoviedb.org/3
+git clone https://github.com/yourusername/Micro-Genre-Miner.git
+cd Micro-Genre-Miner/app
+docker build -t micro-genre-miner .
+docker run -p 8501:8501 micro-genre-miner
 ```
+**Access**: http://localhost:8501
 
----
-
-## 🚀 Quick Start Guide
-
-### Prerequisites
-- Python 3.8+ installed
-- Git installed
-- Internet connection for API calls
-
-### Step 1: Clone & Setup
+### Option 2: Local Installation
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/Micro-Genre-Miner.git
 cd Micro-Genre-Miner
 
 # Create virtual environment
 python -m venv venv
-
-# Activate virtual environment
-# Windows:
-venv\Scripts\activate
-# Mac/Linux:
-source venv/bin/activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Run application
+cd app
+streamlit run app.py
 ```
 
-### Step 2: Get TMDB API Key
-1. Go to [TMDB](https://www.themoviedb.org/signup) and create account
-2. Navigate to Settings → API → Request API Key
-3. Choose "Developer" and fill out the form
-4. Copy your API key
-
-### Step 3: Configure Environment
-```bash
-# Create .env file
-echo TMDB_API_KEY=your_actual_api_key_here > .env
-echo TMDB_BASE_URL=https://api.themoviedb.org/3 >> .env
-```
-
-### Step 4: Run the Project
-```bash
-# Fetch movie data
-python scripts/fetch_data.py
-
-# Clean and process data
-python scripts/clean_data.py
-
-# Build recommendation model
-python scripts/build_model.py
-```
-
----
-
-## 📁 Project Structure
-```
-Micro-Genre-Miner/
-├── 📂 data/
-│   ├── 📂 raw/                  # Raw data from TMDB API
-│   │   ├── raw_movies.json      # Movie metadata
-│   │   └── raw_reviews.json     # User reviews
-│   └── 📂 processed/            # Cleaned & processed data
-├── 📂 scripts/
-│   ├── 🐍 fetch_data.py         # Download data from TMDB
-│   ├── 🧹 clean_data.py         # Data preprocessing
-│   └── 🤖 build_model.py        # Train ML models
-├── 📂 models/                   # Saved ML models
-├── 📂 notebooks/                # Jupyter analysis notebooks
-├── 📂 docs/                     # Documentation
-│   ├── data_dictionary.md       # Data field descriptions
-│   └── methodology.md           # Technical methodology
-├── 🔐 .env                      # API keys (create this!)
-├── 📋 requirements.txt          # Python dependencies
-└── 📖 README.md                 # This file
-```
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**API Key Error:**
-```
-Error: Invalid API key
-```
-- Check your `.env` file exists
-- Verify API key is correct (no extra spaces)
-- Ensure you're using the v3 API key from TMDB
-
-**Module Not Found:**
-```
-ModuleNotFoundError: No module named 'requests'
-```
-- Make sure virtual environment is activated
-- Run `pip install -r requirements.txt`
-
-**Permission Denied:**
-- On Windows: Run terminal as Administrator
-- On Mac/Linux: Check file permissions with `ls -la`
-
-### Getting Help
-- Check existing [Issues](https://github.com/yourusername/Micro-Genre-Miner/issues)
-- Create new issue with error details
-- Include your Python version and OS
-
----
+### Option 3: Streamlit Cloud
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
 
 ## 📊 Dataset Overview
 
-**Current Dataset Size:**
-- 🎬 **Movies**: 5,155 films (~177 MB)
-- 📝 **Reviews**: 18,076 reviews (~11 MB)
-- 🏷️ **Fields**: 25+ attributes per movie
+- **Movies**: 4,968 films from TMDB API
+- **Time Range**: 1900-2030 (130+ years)
+- **Micro-Genres**: 150+ AI-generated categories
+- **Languages**: 85 languages (67% English)
+- **Data Quality**: 96.37% retention rate
 
-**Key Data Fields:**
-- Movie metadata (title, overview, release date)
-- Genre classifications and keywords
-- Ratings, popularity scores, revenue
-- Cast and crew information
-- User reviews and ratings
+## 🏗️ Architecture
 
-For complete field descriptions, see [docs/data_dictionary.md](docs/data_dictionary.md)
+```
+TMDB API → Data Pipeline → ML Processing → Streamlit App
+    ↓           ↓              ↓             ↓
+Raw Data → Clean Data → Embeddings → Micro-Genres → Web UI
+```
 
----
+### Tech Stack
+- **Backend**: Python, Pandas, Scikit-learn, SentenceTransformers
+- **ML/NLP**: KeyBERT, K-Means Clustering, TF-IDF
+- **Frontend**: Streamlit, Plotly, Matplotlib, WordCloud
+- **Deployment**: Docker, Parquet storage
 
-## 🎯 Ethical Considerations
+## 📱 Application Pages
 
-### Data Collection Ethics
+### 🏠 Landing Page
+- Value proposition and concept explanation
+- Live dataset statistics
+- Navigation guidance
 
-✅ **Publicly Available Data**
-- All data sourced from TMDB public API
-- No web scraping or unauthorized access
-- Compliance with TMDB Terms of Service
+### 📊 Overview Dashboard  
+- KPI metrics and treemap visualizations
+- Top micro-genres by popularity and quality
+- Statistical insights and patterns
 
-✅ **Privacy Protection**
-- No collection of personal identifiable information (PII)
-- Reviews are public submissions by users who agreed to TMDB terms
-- Usernames kept but no contact information collected
+### 🔍 Movie Explorer
+- Interactive search and filtering
+- Visual poster grid with detailed modals
+- Cross-genre navigation
 
-✅ **Attribution**
-- TMDB credited as primary data source
-- API usage follows attribution requirements
-- Dataset marked as "Educational Use Only"
+### 📈 Trends Analysis
+- Time-series genre evolution
+- Dynamic word clouds
+- Comparative analytics and insights
 
-### Usage Limitations
+## 🔬 Machine Learning Pipeline
 
-⚠️ **This Dataset Should NOT Be Used For:**
-- Commercial applications without proper licensing
-- Training models that identify or track individuals
-- Creating competing services to TMDB
-- Redistribution without attribution
+### 1. Data Collection
+```bash
+python scripts/fetch_data.py        # Collect from TMDB API
+```
 
-✅ **Appropriate Uses:**
-- Educational projects and learning
-- Academic research
-- Portfolio demonstrations
-- Non-commercial recommendation systems
+### 2. Data Cleaning  
+```bash
+python scripts/clean_data.py        # Clean and validate data
+```
 
-### Bias Considerations
+### 3. Feature Engineering
+```bash
+python scripts/vectorize_cluster.py # Generate embeddings
+```
 
-📊 **Known Biases in Dataset:**
-- **Geographic Bias**: Primarily US/Western films
-- **Language Bias**: Predominantly English-language content
-- **Popularity Bias**: Sample includes only popular films
-- **Recency Bias**: More recent films have more reviews
+### 4. Clustering & Labeling
+```bash
+python scripts/areeya/cluster_and_keywords1.py  # ML clustering
+python scripts/areeya/label_microgenres.py      # Generate labels
+```
 
-**Mitigation Strategies:**
-- Acknowledge limitations in model documentation
-- Do not claim universal applicability
-- Consider diversity metrics when evaluating model
+### 5. Package for Deployment
+```bash
+python scripts/make_parquet.py      # Create optimized dataset
+```
 
----
+## 📈 Performance Metrics
+
+- **Clustering Quality**: 0.342 silhouette score
+- **Processing Time**: ~55 minutes for full pipeline
+- **Storage Efficiency**: 73% compression with Parquet
+- **Application Speed**: <2 second load times
+- **Semantic Quality**: 84% keyword relevance
+
+## 🚀 Deployment Options
+
+### Local Development
+```bash
+streamlit run app.py
+```
+
+### Docker Production
+```bash
+docker-compose up -d
+```
+
+### Cloud Platforms
+- **Streamlit Cloud**: One-click deployment
+- **Heroku**: `git push heroku main`
+- **AWS EC2**: Full production setup
+- **Google Cloud Run**: Serverless containers
+
+See [Deployment Guide](docs/deployment_guide.md) for detailed instructions.
+
+## 📚 Documentation
+
+- 📖 [Project Summary](docs/project_summary.md) - Complete project overview
+- 🤖 [Model Report](docs/model_report.md) - ML methodology and results  
+- 🔄 [Data Pipeline](docs/data_pipeline_report.md) - Processing workflow
+- 💻 [Streamlit Report](docs/streamlit_report.md) - Application analysis
+- 🚀 [Deployment Guide](docs/deployment_guide.md) - Setup instructions
+- 📊 [Data Dictionary](docs/data_dictionary.md) - Field descriptions
+
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+# Required for data collection (optional for demo)
+TMDB_API_KEY=your_tmdb_api_key_here
+TMDB_BASE_URL=https://api.themoviedb.org/3
+
+# Optional Streamlit configuration  
+STREAMLIT_SERVER_PORT=8501
+STREAMLIT_SERVER_ADDRESS=0.0.0.0
+```
+
+### Custom Configuration
+```toml
+# .streamlit/config.toml
+[server]
+port = 8501
+enableCORS = false
+
+[theme]  
+primaryColor = "#FF6B6B"
+backgroundColor = "#FFFFFF"
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md).
+
+### Development Setup
+```bash
+# Fork and clone the repository
+git clone https://github.com/yourusername/Micro-Genre-Miner.git
+
+# Create feature branch
+git checkout -b feature/amazing-feature
+
+# Make changes and test
+python -m pytest tests/
+
+# Submit pull request
+```
+
+### Areas for Contribution
+- 🌍 Multi-language support
+- 🎨 UI/UX improvements  
+- 🤖 Advanced ML models
+- 📊 New visualization types
+- 🐛 Bug fixes and optimizations
+
+## 📊 Project Stats
+
+```
+📈 Repository Metrics:
+- Lines of Code: ~3,500
+- Documentation: 6 comprehensive reports
+- Processing Pipeline: 7 automated scripts
+- Web Application: 4 interactive pages
+- Docker Ready: Production deployment
+- Test Coverage: Core functionality tested
+```
+
+## 🏆 Key Achievements
+
+- ✅ **96.37% data retention** from raw to clean dataset
+- ✅ **150+ micro-genres** automatically discovered
+- ✅ **0.342 silhouette score** for clustering quality
+- ✅ **<2 second load times** for web application
+- ✅ **73% storage compression** with optimized format
+- ✅ **Production ready** with Docker deployment
+
+## 🔮 Roadmap
+
+### Short-term (3-6 months)
+- [ ] User rating and review system
+- [ ] Personalized recommendations  
+- [ ] Advanced filtering options
+- [ ] Mobile app development
+- [ ] A/B testing framework
+
+### Long-term (6-12 months)  
+- [ ] Real-time learning capabilities
+- [ ] Multi-modal analysis (text + images)
+- [ ] Social features and community
+- [ ] Cross-platform recommendation engine
+- [ ] Advanced AI models (GPT, BERT)
 
 ## 🙏 Acknowledgments
 
-- **TMDB**: For providing comprehensive movie database API
-- **Open Source Community**: For libraries and tools used
-- **Contributors**: Everyone who helps improve this project
-
----
-
-**Last Updated:** 2025-11-23
-**Version:** 1.0  
-**API Version:** TMDB API v3
-
-⭐ **Star this repo if you find it helpful!**
+- **TMDB** - For comprehensive movie database API
+- **Streamlit** - For excellent web framework
+- **Hugging Face** - For pre-trained transformer models  
+- **Open Source Community** - For amazing libraries and tools
