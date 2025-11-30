@@ -222,7 +222,7 @@ For complete field descriptions, see [docs/data_dictionary.md](docs/data_diction
 
 ---
 
-**Last Updated:** 2025-09-23  
+**Last Updated:** 2025-11-23
 **Version:** 1.0  
 **API Version:** TMDB API v3
 
