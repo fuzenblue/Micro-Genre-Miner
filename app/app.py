@@ -8,6 +8,40 @@ st.set_page_config(
     layout="wide"
 )
 
+# Custom CSS for Mitr font
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    html, body, [class*="css"] {
+        font-family: "Mitr", sans-serif !important;
+    }
+    
+    .stApp * {
+        font-family: "Mitr", sans-serif !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: "Mitr", sans-serif !important;
+        font-weight: 600 !important;
+    }
+    
+    .stMarkdown, .stMarkdown * {
+        font-family: "Mitr", sans-serif !important;
+    }
+    
+    .stSelectbox, .stTextInput, .stButton, .stMetric {
+        font-family: "Mitr", sans-serif !important;
+    }
+    
+    div[data-testid="metric-container"] {
+        font-family: "Mitr", sans-serif !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Load data for quick stats
 @st.cache_data
 def load_quick_stats():
